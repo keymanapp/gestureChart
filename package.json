@@ -1,0 +1,21 @@
+{
+  "name": "gestureChart",
+  "version": "1.0.0",
+  "description": "Tool to document gestures in a Keyman touch layout",
+  "bin": "dist/gestureChart.js",
+  "main": "dist/gestureChart",
+  "scripts": {
+    "build": "tsc gestureChart.ts --outdir dist",
+    "watch": "npx tsc -w & nodemon -q -w dist"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "commander": "12.0.0",
+    "nodemon": "^3.0.1"
+  }
+}
