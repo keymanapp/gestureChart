@@ -111,6 +111,10 @@ function generateTable(filteredKeys) : string {
       table += `#### Row ${row.id}\n`;
       table += newTableHeader();
       for (let k in row.key) {
+        if (row.key[k].id.startsWith('T_')) {
+          continue;
+        }
+
         // Print a new row
         table += ` | `;
 
