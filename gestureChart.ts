@@ -9,8 +9,10 @@ type formFactorType = "tablet" | "phone";
 ////////////////////////////////////////////////////////////////////
 program
   .description("Tool to document gestures in a touch layout as Markdown tables.\n" +
-    "Gestures can be: longpress, flicks, multitap")
+    "Gestures can be: longpress (default), flicks, and multitap")
     .option("-k, --keyboard <full path to keyboard directory>", "path to a keyboard directory")
+    .option("-f,--flick", "Include flicks in gesture chart")
+    .option("-m,--multitap", "Include multitaps in gesture chart")
     .exitOverride();
 try {
   program.parse();
@@ -28,6 +30,12 @@ if (debugMode) {
   console.log('Parameters:');
   if (options.keyboard) {
     console.log(`Keyboard path: "${options.keyboard}"`);
+  }
+  if (options.flick) {
+    console.log(`Include flicks in gesture chart`);
+  }
+  if (options.multitap) {
+    console.log(`Include multitaps in gesture chart`);
   }
   console.log('\n');
 }
@@ -116,7 +124,7 @@ function generateTable(filteredKeys) : string {
         }
 
         // Print a new row
-        table += ` | `;
+        table += `| `;
 
         // Base Key
         let key = row.key[k];
@@ -130,25 +138,32 @@ function generateTable(filteredKeys) : string {
             table += ` ${getTextFromKey(sk)} `
           }
         }
-        table += ` | `;
 
         // Flick
-        if (key.flick) {
-          for(let f in key.flick) {
-            let flick = key.flick[f];
-            table += ` '${f}': ${getTextFromKey(flick)} <br/>`;
+        if (options.flick) {
+          table += ` | `;
+
+          if (key.flick) {
+            for(let f in key.flick) {
+              let flick = key.flick[f];
+              table += ` '${f}': ${getTextFromKey(flick)} <br/>`;
+            }
           }
         }
-        table += ` | `;
 
         // Multitap
-        if (key.multitap) {
-          for(let m in key.multitap) {
-            let multitap = key.multitap[m];
-            // Multitap is 0-indexed
-            table += ` ${parseInt(m)+1}x: ${getTextFromKey(multitap)} <br/> `;
+        if (options.multitap) {
+          table += ` | `;
+
+          if (key.multitap) {
+            for(let m in key.multitap) {
+              let multitap = key.multitap[m];
+              // Multitap is 0-indexed
+              table += ` ${parseInt(m)+1}x: ${getTextFromKey(multitap)} <br/> `;
+            }
           }
         }
+
         table += ` |\n`;
       }
     }
@@ -168,8 +183,13 @@ function newPreamble(formFactor: formFactorType) : string {
 }
 
 function newTableHeader(): string {
-  return `|Base Key | Longpress | Flick | Multipress |\n` +
-         `|---------|-----------|-------|------------|\n`;
+  let flickHeader =  (options.flick) ? ' Flick |' : '';
+  let flickDivider = (options.flick) ? '-------|' : '';
+  let multitapHeader  = (options.multitap) ? ' Multitap |' : '';
+  let multitapDivider = (options.multitap) ? '----------|' : '';
+
+  return `|Base Key | Longpress |${flickHeader}${multitapHeader}\n` +
+         `|---------|-----------|${flickDivider}${multitapDivider}\n`;
 }
 
 /**
